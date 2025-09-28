@@ -1,0 +1,35 @@
+Here’s a prioritized task list to achieve your goals of a modular, future-proof, and fully editable Storium game state system, separating UI from data and leveraging your database library:
+
+1. Flesh Out the Full Game State TreeView
+Expand the tree to show all tables/entities (games, players, characters, scenes, cards, moves, etc.).
+Ensure the tree reflects the normalized database structure, not just nested objects.
+2. Integrate the Database Library
+Load and save all game state data using your database library (not just in-memory JS objects).
+Replace hardcoded demo data with data loaded from the database.
+Ensure all CRUD operations (add/edit/delete) go through the database API.
+3. Separate UI from Data Logic
+Move all data manipulation (CRUD, queries, etc.) into a separate data module/service.
+UI components should only call this data service, not manipulate data directly.
+Make it easy to swap out the UI or the data backend in the future.
+4. Modularize the Codebase
+Split code into independent modules: UI components, data service, and database adapter.
+Use ES modules or another modular system for maintainability.
+5. Add Import/Export Functionality
+Allow users to import/export the full game state as text (CSV, JSON, or your table format).
+Use the database library’s load/save methods for this.
+6. CRUD UI for All Tables
+Provide editable table/grid views for each entity (not just tree view).
+Allow adding, editing, and deleting rows for all tables.
+7. Sync UI and Data
+Ensure all UI changes are reflected in the database and vice versa.
+Add event listeners or reactive bindings as needed.
+8. Testing and Validation
+Test all CRUD operations and import/export.
+Validate data integrity (unique constraints, foreign keys, etc.).
+9. Documentation and Future-Proofing
+Document the data model, UI structure, and how to extend/replace modules.
+Plan for future features (e.g., real-time sync, multi-user editing).
+Next Steps Recommendation:
+
+Start with steps 1–3: expand the tree, integrate the database, and separate UI/data.
+Once the data flow is modular, add import/export and full CRUD for all tables
