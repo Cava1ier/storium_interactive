@@ -1,41 +1,69 @@
+
 // storium_hub.js
-// Hub: Connects data and UIX, manages state and event wiring
+// Hub: Connects data and UIX, manages state and event wiring (IIFE, global)
 
-import * as Data from './storium_data.js';
-import * as UIX from './storium_uix.js';
+(function(global) {
+    function updateGamesDropdown(DOMHandler) {
+        window.StoriumUIX.renderGamesDropdown(window.StoriumData.getGames(), window.StoriumData.getSelectedGameIdx(), DOMHandler);
+    }
 
-export function updateGamesDropdown(DOMHandler) {
-    UIX.renderGamesDropdown(Data.getGames(), Data.getSelectedGameIdx(), DOMHandler);
-}
+    function updateTreeView(DOMHandler, appendAll, createManyElements, renderGroupList, renderLiSpans, renderLiSpanAndText) {
+        const games = window.StoriumData.getGames();
+        const idx = window.StoriumData.getSelectedGameIdx();
+        window.StoriumUIX.renderTreeView(games[idx], {
+            players: window.StoriumData.getPlayers(),
+            gameSettings: window.StoriumData.getGameSettings(),
+            characters: window.StoriumData.getCharacters(),
+            scenes: window.StoriumData.getScenes(),
+            cardTypes: window.StoriumData.state.cardTypes,
+            cards: window.StoriumData.state.cards,
+            conflicts: window.StoriumData.state.conflicts,
+            conflictPips: window.StoriumData.state.conflictPips,
+            cardInstances: window.StoriumData.state.cardInstances,
+            moves: window.StoriumData.state.moves,
+            goals: window.StoriumData.state.goals,
+            sceneGoals: window.StoriumData.state.sceneGoals,
+            assets: window.StoriumData.state.assets,
+            sceneAssets: window.StoriumData.state.sceneAssets,
+            subplots: window.StoriumData.state.subplots,
+            subplotsProgress: window.StoriumData.state.subplotsProgress,
+            hostActions: window.StoriumData.state.hostActions,
+        }, DOMHandler, appendAll, createManyElements, renderGroupList, renderLiSpans, renderLiSpanAndText);
+    }
 
-export function updateTreeView(DOMHandler, appendAll, createManyElements, renderGroupList, renderLiSpans, renderLiSpanAndText) {
-    const games = Data.getGames();
-    const idx = Data.getSelectedGameIdx();
-    UIX.renderTreeView(games[idx], {
-        players: Data.getPlayers(),
-        gameSettings: Data.getGameSettings(),
-        characters: Data.getCharacters(),
-        scenes: Data.getScenes(),
-        cardTypes: Data.state.cardTypes,
-        cards: Data.state.cards,
-        conflicts: Data.state.conflicts,
-        conflictPips: Data.state.conflictPips,
-        cardInstances: Data.state.cardInstances,
-        moves: Data.state.moves,
-        goals: Data.state.goals,
-        sceneGoals: Data.state.sceneGoals,
-        assets: Data.state.assets,
-        sceneAssets: Data.state.sceneAssets,
-        subplots: Data.state.subplots,
-        subplotsProgress: Data.state.subplotsProgress,
-        hostActions: Data.state.hostActions,
-    }, DOMHandler, appendAll, createManyElements, renderGroupList, renderLiSpans, renderLiSpanAndText);
-}
+    function createGame(DOMHandler, appendAll, createManyElements, renderGroupList, renderLiSpans, renderLiSpanAndText) {
+        const name = prompt("Game name?");
+        if (!name) return;
+        window.StoriumData.createGame(name);
+        updateGamesDropdown(DOMHandler);
+        updateTreeView(DOMHandler, appendAll, createManyElements, renderGroupList, renderLiSpans, renderLiSpanAndText);
+    }
 
-export function createGame(DOMHandler, appendAll, createManyElements, renderGroupList, renderLiSpans, renderLiSpanAndText) {
-    const name = prompt("Game name?");
-    if (!name) return;
-    Data.createGame(name);
-    updateGamesDropdown(DOMHandler);
-    updateTreeView(DOMHandler, appendAll, createManyElements, renderGroupList, renderLiSpans, renderLiSpanAndText);
-}
+    function init() {
+        // Load CssManagement, then build UI and wire events
+        function loadCssManagement(cb) {
+            if (window.CssManagementLoaded) { cb(); return; }
+            const script = document.createElement('script');
+            script.src = 'https://raw.githubusercontent.com/Cava1ier/libraries/refs/heads/main/css/css-management.js';
+            script.onload = function() { window.CssManagementLoaded = true; cb(); };
+            document.head.appendChild(script);
+        }
+
+        loadCssManagement(function() {
+            // Build root UI (assume buildRootUI is global or in window)
+            const refs = window.buildRootUI();
+            // Wire up events (assume wireEvents is global or in window)
+            if (window.wireEvents) window.wireEvents(refs);
+            // Initial render
+            updateGamesDropdown(window.CssManagement.DOMHandler);
+            updateTreeView(window.CssManagement.DOMHandler);
+        });
+    }
+
+    global.StoriumHub = {
+        updateGamesDropdown,
+        updateTreeView,
+        createGame,
+        init
+    };
+})(typeof window !== 'undefined' ? window : this);
