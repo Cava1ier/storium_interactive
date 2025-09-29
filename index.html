@@ -1,131 +1,244 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storium Interactive</title>
-    <style>
-        body { font-family: sans-serif; margin: 0; padding: 0; }
-        .tabs { display: flex; border-bottom: 2px solid #ccc; }
-        .tab {
-            padding: 12px 24px;
-            cursor: pointer;
-            border: none;
-            background: #f7f7f7;
-            font-weight: bold;
-            outline: none;
-        }
-        .tab.active { background: #fff; border-bottom: 2px solid #fff; }
-        .tab-content { display: none; padding: 24px; }
-        .tab-content.active { display: block; }
-        .dropdown-editable {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .dropdown-editable select, .dropdown-editable input[type="text"] {
-            font-size: 1em;
-            padding: 4px;
-        }
-        .crud-btn {
-            background: #eee;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            padding: 2px 6px;
-            margin-left: 2px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        .treeview { margin-left: 16px; }
-        .tree-group {
-            margin-bottom: 8px;
-            border-left: 2px solid #ddd;
-            padding-left: 8px;
-        }
-        .tree-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-bottom: 2px;
-        }
-        .tree-label { font-weight: 500; }
-        .scene, .character, .desc { margin-left: 16px; }
-        .character-cards {
-            display: flex;
-            overflow-x: auto;
-            gap: 8px;
-            max-width: 320px;
-            margin-left: 32px;
-            margin-bottom: 8px;
-        }
-        .character-card {
-            min-width: 90px;
-            border: 1px solid #bbb;
-            border-radius: 4px;
-            padding: 6px;
-            background: #fafafa;
-            text-align: center;
-        }
-        .textarea-large {
-            width: 100%;
-            min-height: 180px;
-            font-size: 1em;
-            margin-bottom: 12px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            resize: vertical;
-        }
-        .icon-btn {
-            background: #e0e0e0;
-            border: 1px solid #bbb;
-            border-radius: 3px;
-            padding: 4px 10px;
-            margin-right: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            vertical-align: middle;
-        }
-        .todo-area {
-            width: 100%;
-            min-height: 120px;
-            margin-bottom: 8px;
-            border: 1px dashed #bbb;
-            background: #f9f9f9;
-            color: #aaa;
-            padding: 8px;
-            border-radius: 4px;
-            resize: vertical;
-        }
-    </style>
 </head>
 <body>
-    <div class="tabs">
-        <button class="tab active" data-tab="0">Storium</button>
-        <button class="tab" data-tab="1">Table Builder</button>
-    </div>
-    <div class="tab-content active" id="tab1">
-        <!-- Editable Dropdown with CRUD -->
-        <div class="dropdown-editable">
-            <label for="gamesDropdown"><b>Games</b></label>
-            <select id="gamesDropdown"></select>
-            <button class="crud-btn" title="Create Game" onclick="createGame()">＋</button>
-            <button class="crud-btn" title="Remove Game" onclick="removeGame()">🗑</button>
-            <button class="crud-btn" title="Update Game" onclick="updateGame()">✎</button>
-        </div>
-        <!-- TreeView for chosen game -->
-        <div id="treeView"></div>
-    </div>
-    <div class="tab-content" id="tab2">
-        <textarea class="textarea-large" id="tableTextArea" placeholder="Edit or paste table definitions here..."></textarea>
-        <div>
-            <button class="icon-btn" onclick="buildTables()">🔨 Build</button>
-            <button class="icon-btn" onclick="loadFromTree()">⟳ Load from Tree</button>
-        </div>
-        <textarea class="todo-area" readonly placeholder="TODO: Area 2 (unimplemented)"></textarea>
-        <textarea class="todo-area" readonly placeholder="TODO: Area 3 (unimplemented)"></textarea>
-    </div>
-    <script>
+    <!-- UI will be built dynamically by JS -->
+
+        <script>
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+    typeof define === 'function' && define.amd ? define(['exports'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.StoriumApp = {}));
+})(this, function (exports) {
+    'use strict';
+
+    // Centralized style component for all app styles
+    class StyleBody extends window.CssManagement.Component {
+        constructor(registry) {
+            super('app', registry);
+            this.nl = registry.nullValue;
+            // Define styles for all UI components
+            this.styles = [
+                'display', 'border-bottom', 'background', 'padding', 'gap',
+                'cursor', 'border', 'font-weight', 'outline', 'color', 'border-radius',
+                'min-height', 'width', 'align-items', 'margin-bottom',
+                'font-size', 'margin-left', 'resize', 'margin-right', 'vertical-align'
+            ];
+            this.cssclasses = [
+                'tabs-main', 'tabs-secondary', 'tabs-accent', 'tabs-muted', 'tabs-highlight',
+                'tab-default', 'tab-active', 'tab-secondary', 'tab-danger', 'tab-info',
+                'tabcontent-inactive', 'tabcontent-active', 'tabcontent-secondary', 'tabcontent-muted', 'tabcontent-highlight',
+                'dropdown-root', 'dropdown-secondary', 'dropdown-accent', 'dropdown-muted', 'dropdown-highlight',
+                'crudbtn-root', 'crudbtn-danger', 'crudbtn-success', 'crudbtn-info', 'crudbtn-muted',
+                'textarea-root', 'textarea-secondary', 'textarea-accent', 'textarea-muted', 'textarea-highlight',
+                'iconbtn-primary', 'iconbtn-secondary', 'iconbtn-danger', 'iconbtn-success', 'iconbtn-info',
+                'todoarea-root', 'todoarea-secondary', 'todoarea-accent', 'todoarea-muted', 'todoarea-highlight'
+            ];
+            this.cssvalues = [
+                // Tabs
+                `flex,2px solid #ccc,#fafafa,0px,0px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `flex,2px solid #bbb,#f0f0f0,2px,2px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `flex,2px solid #09c,#eaf6ff,0px,0px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `flex,2px solid #eee,#f9f9f9,0px,0px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `flex,2px solid #f90,#fffbe6,0px,0px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                // Tab Buttons
+                `${this.nl},${this.nl},#f7f7f7,12px 24px,${this.nl},pointer,none,bold,none,#222,3px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},${this.nl},#fff,12px 24px,${this.nl},pointer,none,bold,none,#222,3px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},${this.nl},#e0e0e0,12px 24px,${this.nl},pointer,none,normal,none,#555,3px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},${this.nl},#ffdddd,12px 24px,${this.nl},pointer,none,bold,none,#a00,3px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},${this.nl},#ddeeff,12px 24px,${this.nl},pointer,none,normal,none,#036,3px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                // Tab Content
+                `none,${this.nl},#fff,24px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},0px,100%,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `block,${this.nl},#fff,24px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},0px,100%,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `block,${this.nl},#f7f7f7,16px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},0px,100%,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `block,${this.nl},#fafafa,8px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},0px,100%,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `block,${this.nl},#fffbe6,24px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},0px,100%,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                // Dropdown Editable
+                `flex,${this.nl},#fff,0px,8px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},0px,${this.nl},${this.nl},center,16px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `flex,${this.nl},#f7f7f7,4px,8px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},2px,${this.nl},${this.nl},center,8px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `flex,${this.nl},#eaf6ff,8px,12px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},4px,${this.nl},${this.nl},center,12px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `flex,${this.nl},#fafafa,0px,4px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},0px,${this.nl},${this.nl},center,4px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `flex,${this.nl},#fffbe6,0px,8px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl},0px,${this.nl},${this.nl},center,16px,${this.nl},${this.nl},${this.nl},${this.nl},${this.nl}`,
+                // CRUD Buttons
+                `${this.nl},1px solid #ccc,#eee,2px 6px,${this.nl},pointer,${this.nl},#222,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},2px,1em,${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #f00,#ffdddd,2px 6px,${this.nl},pointer,${this.nl},#a00,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},2px,1em,${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #0a0,#e0ffe0,2px 6px,${this.nl},pointer,${this.nl},#070,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},2px,1em,${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #09c,#ddeeff,2px 6px,${this.nl},pointer,${this.nl},#036,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},2px,1em,${this.nl},${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #eee,#fafafa,2px 6px,${this.nl},pointer,${this.nl},#aaa,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},2px,1em,${this.nl},${this.nl},${this.nl},${this.nl}`,
+                // Textarea Large
+                `${this.nl},1px solid #ccc,#fff,8px,${this.nl},${this.nl},4px,#222,${this.nl},${this.nl},4px,180px,100%,${this.nl},12px,1em,vertical,${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #bbb,#f7f7f7,6px,${this.nl},${this.nl},4px,#333,${this.nl},${this.nl},4px,120px,100%,${this.nl},8px,0.9em,vertical,${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #09c,#eaf6ff,10px,${this.nl},${this.nl},6px,#036,${this.nl},${this.nl},6px,220px,100%,${this.nl},16px,1.1em,vertical,${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #eee,#fafafa,4px,${this.nl},${this.nl},2px,#aaa,${this.nl},${this.nl},2px,80px,100%,${this.nl},4px,0.8em,vertical,${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #f90,#fffbe6,8px,${this.nl},${this.nl},4px,#a60,${this.nl},${this.nl},4px,200px,100%,${this.nl},10px,1em,vertical,${this.nl},${this.nl},${this.nl}`,
+                // Icon Button Group
+                `${this.nl},1px solid #bbb,#e0e0e0,4px 10px,${this.nl},pointer,${this.nl},#222,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},${this.nl},1em,${this.nl},6px,middle,${this.nl}`,
+                `${this.nl},1px solid #ccc,#f7f7f7,4px 10px,${this.nl},pointer,${this.nl},#555,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},${this.nl},1em,${this.nl},6px,middle,${this.nl}`,
+                `${this.nl},1px solid #f00,#ffdddd,4px 10px,${this.nl},pointer,${this.nl},#a00,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},${this.nl},1em,${this.nl},6px,middle,${this.nl}`,
+                `${this.nl},1px solid #0a0,#e0ffe0,4px 10px,${this.nl},pointer,${this.nl},#070,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},${this.nl},1em,${this.nl},6px,middle,${this.nl}`,
+                `${this.nl},1px solid #09c,#ddeeff,4px 10px,${this.nl},pointer,${this.nl},#036,none,${this.nl},3px,${this.nl},${this.nl},${this.nl},${this.nl},1em,${this.nl},6px,middle,${this.nl}`,
+                // Todo Area
+                `${this.nl},1px dashed #bbb,#f9f9f9,8px,${this.nl},${this.nl},4px,#aaa,${this.nl},${this.nl},4px,120px,100%,${this.nl},8px,1em,vertical,${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px dashed #eee,#fafafa,4px,${this.nl},${this.nl},2px,#bbb,${this.nl},${this.nl},2px,80px,100%,${this.nl},4px,0.9em,vertical,${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #09c,#eaf6ff,12px,${this.nl},${this.nl},6px,#036,${this.nl},${this.nl},6px,160px,100%,${this.nl},12px,1.1em,vertical,${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #eee,#fff,2px,${this.nl},${this.nl},1px,#aaa,${this.nl},${this.nl},1px,60px,100%,${this.nl},2px,0.8em,vertical,${this.nl},${this.nl},${this.nl}`,
+                `${this.nl},1px solid #f90,#fffbe6,10px,${this.nl},${this.nl},4px,#a60,${this.nl},${this.nl},4px,140px,100%,${this.nl},10px,1em,vertical,${this.nl},${this.nl},${this.nl}`
+            ];
+            this.registerStyles();
+        }
+    }
+
+    // Helper functions
+    function createElements(tag, { cssclasses, getClassName }, isTextarea = false, ...texts) {
+        return texts.map((text, i) => {
+            const elem = window.CssManagement.DOMHandler.createElement(tag, {
+                class: getClassName(cssclasses[i % cssclasses.length])
+            });
+            if (isTextarea) {
+                elem.placeholder = text;
+            } else {
+                elem.textContent = text;
+            }
+            return elem;
+        });
+    }
+
+    function appendAll(parent, children) {
+        children.forEach(child => window.CssManagement.DOMHandler.appendChild(parent, child));
+    }
+
+    // Updated buildRootUI function
+    function buildRootUI() {
+        const DOMHandler = window.CssManagement.DOMHandler;
+        // Clear body
+        document.body.innerHTML = '';
+
+        // Registry and centralized styles
+        const registry = new window.CssManagement.StyleRegistry('storiumApp');
+        const styleBody = new StyleBody(registry);
+
+        // Tabs
+        const tabsArr = createElements('button', {
+            cssclasses: ['tab-default', 'tab-active', 'tab-secondary', 'tab-danger', 'tab-info'],
+            getClassName: (cls) => styleBody.getClassName(cls)
+        }, false, 'Storium', 'Table Builder', 'Extra 1', 'Extra 2', 'Extra 3');
+        tabsArr.forEach((btn, i) => btn.setAttribute('data-tab', i));
+        tabsArr[0].classList.add(styleBody.getClassName('tab-active'));
+        const tabs = DOMHandler.createElement('div', { class: styleBody.getClassName('tabs-main') });
+        appendAll(tabs, tabsArr);
+
+        // Tab 1: Storium
+        const tab1 = DOMHandler.createElement('div', { class: styleBody.getClassName('tabcontent-active'), id: 'tab1' });
+        // Dropdown-editable
+        const ddEdit = DOMHandler.createElement('div', { class: styleBody.getClassName('dropdown-root') });
+        const label = DOMHandler.createElement('label', { htmlFor: 'gamesDropdown' });
+        appendAll(label, [DOMHandler.createElement('b', { textContent: 'Games' })]);
+        const gamesDropdown = DOMHandler.createElement('select', { id: 'gamesDropdown' });
+        const crudBtns = createElements('button', {
+            cssclasses: ['crudbtn-root', 'crudbtn-danger', 'crudbtn-success', 'crudbtn-info', 'crudbtn-muted'],
+            getClassName: (cls) => styleBody.getClassName(cls)
+        }, false, '＋', '🗑', '✎', '★', '…');
+        crudBtns[0].title = 'Create Game';
+        crudBtns[1].title = 'Remove Game';
+        crudBtns[2].title = 'Update Game';
+        crudBtns[3].title = 'Extra 1';
+        crudBtns[4].title = 'Extra 2';
+        appendAll(ddEdit, [label, gamesDropdown, ...crudBtns]);
+        // TreeView
+        const treeView = DOMHandler.createElement('div', { id: 'treeView' });
+        appendAll(tab1, [ddEdit, treeView]);
+
+        // ...existing code for tab2, event wiring, and app logic...
+    }
+
+    // ...rest of your app logic...
+
+    // Expose for debugging if needed
+    exports.StyleBody = StyleBody;
+    exports.buildRootUI = buildRootUI;
+});
+        </script>
+</body>
+</html>
+
+    function buildRootUI() {
+        const DOMHandler = window.CssManagement.DOMHandler;
+        // Clear body
+        document.body.innerHTML = '';
+
+        // Registry and components
+        if (!registry) registry = new window.CssManagement.StyleRegistry('storiumApp');
+        const styleBody = new StyleBody(registry);
+
+        // Tabs (multiple at once)
+    const tabsArr = createElements('button', { cssclasses: ['default', 'active', 'secondary', 'danger', 'info'], getClassName: (cls) => styleBody.getClassName('tab', cls) }, false, 'Storium', 'Table Builder', 'Extra 1', 'Extra 2', 'Extra 3');
+    tabsArr.forEach((btn, i) => btn.setAttribute('data-tab', i));
+    tabsArr[0].classList.add('active');
+    const tabs = DOMHandler.createElement('div', { class: styleBody.getClassName('tabs', 'main') });
+    appendAll(tabs, tabsArr);
+
+        // Tab 1: Storium
+    const tab1 = DOMHandler.createElement('div', { class: styleBody.getClassName('tabcontent', 'active'), id: 'tab1' });
+        // Dropdown-editable (multiple at once)
+    const ddEdit = DOMHandler.createElement('div', { class: styleBody.getClassName('dropdowneditable', 'root') });
+        const label = DOMHandler.createElement('label', { htmlFor: 'gamesDropdown' });
+        appendAll(label, [DOMHandler.createElement('b', { textContent: 'Games' })]);
+        const gamesDropdown = DOMHandler.createElement('select', { id: 'gamesDropdown' });
+    const crudBtns = createElements('button', { cssclasses: ['root', 'danger', 'success', 'info', 'muted'], getClassName: (cls) => styleBody.getClassName('crudbtn', cls) }, false, '＋', '🗑', '✎', '★', '…');
+        crudBtns[0].title = 'Create Game';
+        crudBtns[1].title = 'Remove Game';
+        crudBtns[2].title = 'Update Game';
+        crudBtns[3].title = 'Extra 1';
+        crudBtns[4].title = 'Extra 2';
+        appendAll(ddEdit, [label, gamesDropdown, ...crudBtns]);
+        // TreeView
+        const treeView = DOMHandler.createElement('div', { id: 'treeView' });
+        appendAll(tab1, [ddEdit, treeView]);
+
+        // Tab 2: Table Builder
+    const tab2 = DOMHandler.createElement('div', { class: styleBody.getClassName('tabcontent', 'inactive'), id: 'tab2' });
+        // Multiple textarea styles
+        const textareas = createElements('textarea', { cssclasses: ['root', 'secondary', 'accent', 'muted', 'highlight'], getClassName: (cls) => styleBody.getClassName('textarealarge', cls) }, false,
+            'Edit or paste table definitions here...',
+            'Secondary textarea',
+            'Accent textarea',
+            'Muted textarea',
+            'Highlight textarea');
+        textareas[0].id = 'tableTextArea';
+        // Icon button group (multiple at once)
+        const btnRow = DOMHandler.createElement('div');
+    const iconBtns = createElements('button', { cssclasses: ['primary', 'secondary', 'danger', 'success', 'info'], getClassName: (cls) => styleBody.getClassName('iconbtngroup', cls) }, false, '🔨 Build', '… Secondary', '⚠ Danger', '✔ Success', '⟳ Load from Tree');
+        appendAll(btnRow, iconBtns);
+        // Multiple todo areas
+        const todos = createElements('textarea', { cssclasses: ['root', 'secondary', 'accent', 'muted', 'highlight'], getClassName: (cls) => styleBody.getClassName('todoarea', cls) }, true,
+            'TODO: Area 2 (unimplemented)',
+            'TODO: Area 3 (unimplemented)',
+            'TODO: Area 4 (unimplemented)',
+            'TODO: Area 5 (unimplemented)',
+            'TODO: Area 6 (unimplemented)');
+        appendAll(tab2, [...textareas, btnRow, ...todos]);
+
+        // Append all to body
+        appendAll(document.body, [tabs, tab1, tab2]);
+
+        // Return references for wiring events (use first of each array for main logic)
+        return {
+            tabStorium: tabsArr[0],
+            tabBuilder: tabsArr[1],
+            tab1, tab2, gamesDropdown,
+            btnCreate: crudBtns[0], btnRemove: crudBtns[1], btnUpdate: crudBtns[2],
+            treeView,
+            btnBuild: iconBtns[0], btnLoad: iconBtns[4], textarea: textareas[0],
+            tabBtnComp, tabContentComp
+        };
+    }
+
+    // ...existing code...
 
         // Load CssManagement library
         let CssManagementLoaded = false;
@@ -246,10 +359,12 @@
 
                     // Game Desc & Settings
                     const gameDesc = DOMHandler.createElement('div', { class: 'tree-item' });
-                    DOMHandler.appendChild(gameDesc, DOMHandler.createElement('span', { class: 'tree-label', textContent: 'Desc:' }));
-                    DOMHandler.appendChild(gameDesc, DOMHandler.createElement('span', { textContent: game.desc || '(none)' }));
-                    DOMHandler.appendChild(gameDesc, DOMHandler.createElement('button', { class: 'crud-btn', title: 'Edit Desc', 'data-action': 'editGameDesc', textContent: '✎' }));
-                    DOMHandler.appendChild(container, gameDesc);
+                    appendAll(gameDesc, createManyElements('span', [
+                        { class: 'tree-label', textContent: 'Desc:' },
+                        { textContent: game.desc || '(none)' }
+                    ]));
+                    appendAll(gameDesc, [DOMHandler.createElement('button', { class: 'crud-btn', title: 'Edit Desc', 'data-action': 'editGameDesc', textContent: '✎' })]);
+                    appendAll(container, [gameDesc]);
 
                     // Game Settings
                     const settings = allData.gameSettings.filter(s => s.game_id === game.id);
@@ -303,17 +418,23 @@
                         const sceneDiv = DOMHandler.createElement('div', { class: 'scene tree-group' });
                         // Scene header
                         const sceneHeader = DOMHandler.createElement('div', { class: 'tree-item' });
-                        DOMHandler.appendChild(sceneHeader, DOMHandler.createElement('span', { class: 'tree-label', textContent: scene.name }));
-                        DOMHandler.appendChild(sceneHeader, DOMHandler.createElement('span', { style: 'font-size:0.9em;color:#888;', textContent: '[' + scene.status + ']' }));
-                        DOMHandler.appendChild(sceneHeader, DOMHandler.createElement('button', { class: 'crud-btn', title: 'Edit Scene', 'data-action': 'editScene', 'data-si': si, textContent: '✎' }));
-                        DOMHandler.appendChild(sceneHeader, DOMHandler.createElement('button', { class: 'crud-btn', title: 'Remove Scene', 'data-action': 'removeScene', 'data-si': si, textContent: '🗑' }));
-                        DOMHandler.appendChild(sceneDiv, sceneHeader);
+                        appendAll(sceneHeader, createManyElements('span', [
+                            { class: 'tree-label', textContent: scene.name },
+                            { style: 'font-size:0.9em;color:#888;', textContent: '[' + scene.status + ']' }
+                        ]));
+                        appendAll(sceneHeader, createManyElements('button', [
+                            { class: 'crud-btn', title: 'Edit Scene', 'data-action': 'editScene', 'data-si': si, textContent: '✎' },
+                            { class: 'crud-btn', title: 'Remove Scene', 'data-action': 'removeScene', 'data-si': si, textContent: '🗑' }
+                        ]));
+                        appendAll(sceneDiv, [sceneHeader]);
                         // Scene desc
                         const sceneDesc = DOMHandler.createElement('div', { class: 'desc tree-item' });
-                        DOMHandler.appendChild(sceneDesc, DOMHandler.createElement('span', { class: 'tree-label', textContent: 'Desc:' }));
-                        DOMHandler.appendChild(sceneDesc, DOMHandler.createElement('span', { textContent: scene.desc || '(none)' }));
-                        DOMHandler.appendChild(sceneDesc, DOMHandler.createElement('button', { class: 'crud-btn', title: 'Edit Desc', 'data-action': 'editSceneDesc', 'data-si': si, textContent: '✎' }));
-                        DOMHandler.appendChild(sceneDiv, sceneDesc);
+                        appendAll(sceneDesc, createManyElements('span', [
+                            { class: 'tree-label', textContent: 'Desc:' },
+                            { textContent: scene.desc || '(none)' }
+                        ]));
+                        appendAll(sceneDesc, [DOMHandler.createElement('button', { class: 'crud-btn', title: 'Edit Desc', 'data-action': 'editSceneDesc', 'data-si': si, textContent: '✎' })]);
+                        appendAll(sceneDiv, [sceneDesc]);
                         // Pips
                         const pipsDiv = DOMHandler.createElement('div', { class: 'tree-item' });
                         DOMHandler.appendChild(pipsDiv, DOMHandler.createElement('span', { class: 'tree-label', textContent: 'Pips:' }));
@@ -321,85 +442,78 @@
                         DOMHandler.appendChild(sceneDiv, pipsDiv);
 
                         // Obstacles
-                        const obsGroup = DOMHandler.createElement('div', { class: 'tree-group' });
-                        DOMHandler.appendChild(obsGroup, DOMHandler.createElement('b', { textContent: 'Obstacles' }));
-                        const obsUl = DOMHandler.createElement('ul', { style: 'margin:0 0 0 16px;' });
-                        conflicts.filter(c=>c.scene_id===scene.id && c.type==='obstacle').forEach(ob => {
-                            const li = DOMHandler.createElement('li');
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { class: 'tree-label', textContent: ob.name }));
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { style: 'color:#888;', textContent: `[${ob.status}${ob.outcome ? ', ' + ob.outcome : ''}]` }));
-                            DOMHandler.appendChild(obsUl, li);
+                        renderGroupList({
+                            groupLabel: 'Obstacles',
+                            items: conflicts.filter(c=>c.scene_id===scene.id && c.type==='obstacle'),
+                            itemRenderFn: (li, ob) => renderLiSpans(li, [
+                                { class: 'tree-label', textContent: ob.name },
+                                { style: 'color:#888;', textContent: `[${ob.status}${ob.outcome ? ', ' + ob.outcome : ''}]` }
+                            ]),
+                            sceneDiv
                         });
-                        DOMHandler.appendChild(obsGroup, obsUl);
-                        DOMHandler.appendChild(sceneDiv, obsGroup);
 
                         // Character Conflicts
-                        const charConfGroup = DOMHandler.createElement('div', { class: 'tree-group' });
-                        DOMHandler.appendChild(charConfGroup, DOMHandler.createElement('b', { textContent: 'Character Conflicts' }));
-                        const charConfUl = DOMHandler.createElement('ul', { style: 'margin:0 0 0 16px;' });
-                        conflicts.filter(c=>c.scene_id===scene.id && c.type==='character').forEach(ob => {
-                            const li = DOMHandler.createElement('li');
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { class: 'tree-label', textContent: ob.name }));
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { style: 'color:#888;', textContent: `[${ob.status}${ob.outcome ? ', ' + ob.outcome : ''}]` }));
-                            DOMHandler.appendChild(charConfUl, li);
+                        renderGroupList({
+                            groupLabel: 'Character Conflicts',
+                            items: conflicts.filter(c=>c.scene_id===scene.id && c.type==='character'),
+                            itemRenderFn: (li, ob) => renderLiSpans(li, [
+                                { class: 'tree-label', textContent: ob.name },
+                                { style: 'color:#888;', textContent: `[${ob.status}${ob.outcome ? ', ' + ob.outcome : ''}]` }
+                            ]),
+                            sceneDiv
                         });
-                        DOMHandler.appendChild(charConfGroup, charConfUl);
-                        DOMHandler.appendChild(sceneDiv, charConfGroup);
 
                         // Scene Characters
-                        const scGroup = DOMHandler.createElement('div', { class: 'tree-group' });
-                        DOMHandler.appendChild(scGroup, DOMHandler.createElement('b', { textContent: 'Scene Characters' }));
-                        const scUl = DOMHandler.createElement('ul', { style: 'margin:0 0 0 16px;' });
-                        sceneCharacters.filter(sc=>sc.scene_id===scene.id).forEach(sc => {
-                            const char = characters.find(c=>c.id===sc.character_id);
-                            const li = DOMHandler.createElement('li');
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { class: 'tree-label', textContent: char ? char.name : '' }));
-                            DOMHandler.appendChild(scUl, li);
+                        renderGroupList({
+                            groupLabel: 'Scene Characters',
+                            items: sceneCharacters.filter(sc=>sc.scene_id===scene.id),
+                            itemRenderFn: (li, sc) => {
+                                const char = characters.find(c=>c.id===sc.character_id);
+                                renderLiSpans(li, [
+                                    { class: 'tree-label', textContent: char ? char.name : '' }
+                                ]);
+                            },
+                            sceneDiv
                         });
-                        DOMHandler.appendChild(scGroup, scUl);
-                        DOMHandler.appendChild(sceneDiv, scGroup);
 
                         // Goals
-                        const goalsGroup = DOMHandler.createElement('div', { class: 'tree-group' });
-                        DOMHandler.appendChild(goalsGroup, DOMHandler.createElement('b', { textContent: 'Goals' }));
-                        const goalsUl = DOMHandler.createElement('ul', { style: 'margin:0 0 0 16px;' });
-                        sceneGoals.filter(g=>g.scene_id===scene.id).forEach(goal => {
-                            const g = goals.find(x=>x.id===goal.goal_id);
-                            const li = DOMHandler.createElement('li');
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { class: 'tree-label', textContent: g ? g.name : '' }));
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { style: 'color:#888;', textContent: `[${goal.status}]` }));
-                            DOMHandler.appendChild(goalsUl, li);
+                        renderGroupList({
+                            groupLabel: 'Goals',
+                            items: sceneGoals.filter(g=>g.scene_id===scene.id),
+                            itemRenderFn: (li, goal) => {
+                                const g = goals.find(x=>x.id===goal.goal_id);
+                                renderLiSpans(li, [
+                                    { class: 'tree-label', textContent: g ? g.name : '' },
+                                    { style: 'color:#888;', textContent: `[${goal.status}]` }
+                                ]);
+                            },
+                            sceneDiv
                         });
-                        DOMHandler.appendChild(goalsGroup, goalsUl);
-                        DOMHandler.appendChild(sceneDiv, goalsGroup);
 
                         // Assets
-                        const assetsGroup = DOMHandler.createElement('div', { class: 'tree-group' });
-                        DOMHandler.appendChild(assetsGroup, DOMHandler.createElement('b', { textContent: 'Assets' }));
-                        const assetsUl = DOMHandler.createElement('ul', { style: 'margin:0 0 0 16px;' });
-                        sceneAssets.filter(a=>a.scene_id===scene.id).forEach(asset => {
-                            const a = assets.find(x=>x.id===asset.asset_id);
-                            const li = DOMHandler.createElement('li');
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { class: 'tree-label', textContent: a ? a.name : '' }));
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { style: 'color:#888;', textContent: `[${asset.status}]` }));
-                            DOMHandler.appendChild(assetsUl, li);
+                        renderGroupList({
+                            groupLabel: 'Assets',
+                            items: sceneAssets.filter(a=>a.scene_id===scene.id),
+                            itemRenderFn: (li, asset) => {
+                                const a = assets.find(x=>x.id===asset.asset_id);
+                                renderLiSpans(li, [
+                                    { class: 'tree-label', textContent: a ? a.name : '' },
+                                    { style: 'color:#888;', textContent: `[${asset.status}]` }
+                                ]);
+                            },
+                            sceneDiv
                         });
-                        DOMHandler.appendChild(assetsGroup, assetsUl);
-                        DOMHandler.appendChild(sceneDiv, assetsGroup);
 
                         // Moves
-                        const movesGroup = DOMHandler.createElement('div', { class: 'tree-group' });
-                        DOMHandler.appendChild(movesGroup, DOMHandler.createElement('b', { textContent: 'Moves' }));
-                        const movesUl = DOMHandler.createElement('ul', { style: 'margin:0 0 0 16px;' });
-                        moves.filter(m=>m.scene_id===scene.id).forEach(move => {
-                            const char = characters.find(c=>c.id===cardInstances.find(ci=>ci.id===move.card_instance_id)?.owner_character_id);
-                            const li = DOMHandler.createElement('li');
-                            DOMHandler.appendChild(li, DOMHandler.createElement('span', { class: 'tree-label', textContent: char ? char.name : '' }));
-                            DOMHandler.appendChild(li, document.createTextNode(': ' + move.text));
-                            DOMHandler.appendChild(movesUl, li);
+                        renderGroupList({
+                            groupLabel: 'Moves',
+                            items: moves.filter(m=>m.scene_id===scene.id),
+                            itemRenderFn: (li, move) => {
+                                const char = characters.find(c=>c.id===cardInstances.find(ci=>ci.id===move.card_instance_id)?.owner_character_id);
+                                renderLiSpanAndText(li, { class: 'tree-label', textContent: char ? char.name : '' }, ': ' + move.text);
+                            },
+                            sceneDiv
                         });
-                        DOMHandler.appendChild(movesGroup, movesUl);
-                        DOMHandler.appendChild(sceneDiv, movesGroup);
 
                         DOMHandler.appendChild(scenesGroup, sceneDiv);
                     });
@@ -459,43 +573,47 @@
             };
         })();
 
-        // --- Wire up UI and events using the new modular IIFEs ---
-        function showTab(idx) {
-            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
-            document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === idx));
-            if (idx === 0) window.StoriumService.updateTreeView();
-        }
+    // --- Wire up UI and events using the new modular IIFEs and DOMHandler ---
+    function showTab(idx, refs) {
+        [refs.tabStorium, refs.tabBuilder].forEach((t, i) => t.classList.toggle('active', i === idx));
+        [refs.tab1, refs.tab2].forEach((c, i) => c.classList.toggle('active', i === idx));
+        if (idx === 0) window.StoriumService.updateTreeView();
+    }
 
-        window.addEventListener('DOMContentLoaded', function() {
-            // Tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const idx = parseInt(tab.getAttribute('data-tab'), 10);
-                    showTab(idx);
-                });
-            });
-            // Games dropdown
-            document.getElementById('gamesDropdown').onchange = function() {
-                window.StoriumData.setSelectedGameIdx(this.selectedIndex);
-                window.StoriumService.updateTreeView();
-            };
-            // CRUD buttons
-            document.querySelector('button[title="Create Game"]').onclick = window.StoriumService.createGame;
-            // (Remove and update game can be added to service as needed)
-            // Table Builder
-            document.querySelector('button.icon-btn[onclick*="buildTables"]').onclick = function() {
-                const text = document.getElementById('tableTextArea').value;
-                const tables = window.StoriumData.parseTables(text);
-                window.StoriumData.buildDataModelFromTables(tables);
-                if (window.StoriumData.getGames().length > 0) window.StoriumData.setSelectedGameIdx(0);
-                window.StoriumService.updateGamesDropdown();
-                window.StoriumService.updateTreeView();
-            };
-            document.querySelector('button.icon-btn[onclick*="loadFromTree"]').onclick = function() {
-                // Placeholder: implement as needed
-                alert('Load from Tree (not implemented)');
-            };
+    function wireEvents(refs) {
+        // Tabs
+        refs.tabStorium.addEventListener('click', function() { showTab(0, refs); });
+        refs.tabBuilder.addEventListener('click', function() { showTab(1, refs); });
+        // Games dropdown
+        refs.gamesDropdown.onchange = function() {
+            window.StoriumData.setSelectedGameIdx(this.selectedIndex);
+            window.StoriumService.updateTreeView();
+        };
+        // CRUD buttons
+        refs.btnCreate.onclick = window.StoriumService.createGame;
+        // (Remove and update game can be added to service as needed)
+        // Table Builder
+        refs.btnBuild.onclick = function() {
+            const text = refs.textarea.value;
+            const tables = window.StoriumData.parseTables(text);
+            window.StoriumData.buildDataModelFromTables(tables);
+            if (window.StoriumData.getGames().length > 0) window.StoriumData.setSelectedGameIdx(0);
+            window.StoriumService.updateGamesDropdown();
+            window.StoriumService.updateTreeView();
+        };
+        refs.btnLoad.onclick = function() {
+            alert('Load from Tree (not implemented)');
+        };
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        loadCssManagement(function() {
+            // Build root UI
+            const refs = buildRootUI();
+            // Wire up events
+            wireEvents(refs);
             // Initial render
             window.StoriumService.updateGamesDropdown();
             window.StoriumService.updateTreeView();
         });
+    });
