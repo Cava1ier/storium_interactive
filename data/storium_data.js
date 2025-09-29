@@ -8,18 +8,20 @@
 //
 // TODO: Modularize treeview and event logic into the new files above.
 
+
 // storium_data.js
 // Data Model and CRUD for Storium Interactive (IIFE, global)
-
+(function(global) {
+    const state = {
+        games: [], players: [], gameSettings: [], characters: [], playersCharacters: [], cardTypes: [], cards: [], charactersCards: [], scenes: [], sceneCharacters: [], conflicts: [], conflictPips: [], cardInstances: [], moves: [], goals: [], sceneGoals: [], assets: [], sceneAssets: [], subplots: [], subplotsProgress: [], hostActions: [], selectedGameIdx: 0
+    };
 
     // --- RelationalDb integration ---
     let dbDriver = null;
 
     function parseTables(text) {
-        // Use RelationalDb.DatabaseDriver to parse tables from text
         dbDriver = new global.RelationalDb.DatabaseDriver();
         dbDriver.loadFromText(text);
-        // For legacy compatibility, return a plain object of arrays
         const tables = {};
         for (const tblName in dbDriver.database.tables.tables) {
             const table = dbDriver.database.tables.tables[tblName];
@@ -33,7 +35,6 @@
     }
 
     function buildDataModelFromTables(tables) {
-        // Legacy: keep state in sync for now
         function int(v) { return v === undefined || v === null ? null : parseInt(v, 10); }
         state.games = (tables.tblGames||[]).map(r => ({ id: int(r.id), name: r.name, desc: r.desc }));
         state.players = (tables.tblPlayers||[]).map(r => ({ id: int(r.id), name: r.name }));

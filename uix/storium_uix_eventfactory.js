@@ -1,3 +1,12 @@
+// Event wiring/factory for Storium Interactive (IIFE, global)
+(function(global) {
+	// This function will be expanded to wire up all UI events in a modular way
+	function setupEventHandlers(refs, DOMHandler) {
+		// Example: refs.btnCreate.addEventListener('click', ...)
+		// TODO: Implement event wiring for all UI controls
+	}
+	global.StoriumUIXEventFactory = { setupEventHandlers };
+})(typeof window !== 'undefined' ? window : this);
 // TODO: UIX/DATA FILES
 // - uix/storium_uix.js: Main UI rendering logic
 // - uix/storium_uix_treeview.js: TreeView rendering logic (modularize from main UIX)

@@ -1,3 +1,12 @@
+// Textarea table loader/parser logic for Storium Interactive (IIFE, global)
+(function(global) {
+	// This will provide parsing helpers for textarea-based table input
+	function parseTableText(text) {
+		// TODO: Implement robust table parsing from textarea
+		return {};
+	}
+	global.StoriumDataTextareaTableBuilder = { parseTableText };
+})(typeof window !== 'undefined' ? window : this);
 // TODO: UIX/DATA FILES
 // - uix/storium_uix.js: Main UI rendering logic
 // - uix/storium_uix_treeview.js: TreeView rendering logic (modularize from main UIX)

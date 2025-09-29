@@ -1,3 +1,12 @@
+// Tree data builder logic for Storium Interactive (IIFE, global)
+(function(global) {
+	// This will provide tree data structure helpers for the UIX treeview
+	function buildTreeData(game, allData) {
+		// TODO: Implement tree data structure building from game/allData
+		return {};
+	}
+	global.StoriumDataTreeBuilder = { buildTreeData };
+})(typeof window !== 'undefined' ? window : this);
 // TODO: UIX/DATA FILES
 // - uix/storium_uix.js: Main UI rendering logic
 // - uix/storium_uix_treeview.js: TreeView rendering logic (modularize from main UIX)

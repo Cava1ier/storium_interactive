@@ -24,23 +24,8 @@
         dd.selectedIndex = selectedIdx;
     }
 
-    function renderTreeView(game, allData, DOMHandler, appendAll, createManyElements, renderGroupList, renderLiSpans, renderLiSpanAndText) {
-        const container = document.getElementById('treeView');
-        container.innerHTML = '';
-        if (!game) return;
-        // Game Desc & Settings
-        const gameDesc = DOMHandler.createElement('div', { class: 'tree-item' });
-        appendAll(gameDesc, createManyElements('span', [
-            { class: 'tree-label', textContent: 'Desc:' },
-            { textContent: game.desc || '(none)' }
-        ]));
-        appendAll(gameDesc, [DOMHandler.createElement('button', { class: 'crud-btn', title: 'Edit Desc', 'data-action': 'editGameDesc', textContent: '✎' })]);
-        appendAll(container, [gameDesc]);
-        // ... (rest of tree rendering as in index.html) ...
-    }
-
     global.StoriumUIX = {
         renderGamesDropdown,
-        renderTreeView
+        renderTreeView: global.StoriumUIXTreeView ? global.StoriumUIXTreeView.renderTreeView : function() {}
     };
 })(typeof window !== 'undefined' ? window : this);
