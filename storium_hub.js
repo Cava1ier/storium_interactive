@@ -2,7 +2,18 @@
 // storium_hub.js
 // Hub: Connects data and UIX, manages state and event wiring (IIFE, global)
 
+// storium_hub.js
+// Hub: Connects data and UIX, manages state and event wiring (IIFE, global)
+
 (function(global) {
+    // Helper to load a script if not already present
+    function loadScriptIfNeeded(src, globalName, cb) {
+        if (global[globalName]) { cb && cb(); return; }
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = function() { cb && cb(); };
+        document.head.appendChild(s);
+    }
     function updateGamesDropdown(DOMHandler) {
         window.StoriumUIX.renderGamesDropdown(window.StoriumData.getGames(), window.StoriumData.getSelectedGameIdx(), DOMHandler);
     }
@@ -40,7 +51,7 @@
     }
 
     function init() {
-        // Load CssManagement, then build UI and wire events
+        // Load dependencies in order: CssManagement, databasegrokai, storium_data, storium_uix
         function loadCssManagement(cb) {
             if (window.CssManagementLoaded) { cb(); return; }
             const script = document.createElement('script');
@@ -48,15 +59,27 @@
             script.onload = function() { window.CssManagementLoaded = true; cb(); };
             document.head.appendChild(script);
         }
-
+        function loadDatabaseGrok(cb) {
+            if (window.RelationalDb) { cb(); return; }
+            var s = document.createElement('script');
+            s.src = 'https://raw.githubusercontent.com/Cava1ier/libraries/main/database/databasegrokai.js';
+            s.onload = cb;
+            document.head.appendChild(s);
+        }
         loadCssManagement(function() {
-            // Build root UI (assume buildRootUI is global or in window)
-            const refs = window.buildRootUI();
-            // Wire up events (assume wireEvents is global or in window)
-            if (window.wireEvents) window.wireEvents(refs);
-            // Initial render
-            updateGamesDropdown(window.CssManagement.DOMHandler);
-            updateTreeView(window.CssManagement.DOMHandler);
+            loadDatabaseGrok(function() {
+                loadScriptIfNeeded('storium_data.js', 'StoriumData', function() {
+                    loadScriptIfNeeded('storium_uix.js', 'StoriumUIX', function() {
+                        // Build root UI (assume buildRootUI is global or in window)
+                        const refs = window.buildRootUI();
+                        // Wire up events (assume wireEvents is global or in window)
+                        if (window.wireEvents) window.wireEvents(refs);
+                        // Initial render
+                        updateGamesDropdown(window.CssManagement.DOMHandler);
+                        updateTreeView(window.CssManagement.DOMHandler);
+                    });
+                });
+            });
         });
     }
 

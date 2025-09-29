@@ -2,37 +2,29 @@
 // storium_data.js
 // Data Model and CRUD for Storium Interactive (IIFE, global)
 
-(function(global) {
-    const state = {
-        games: [], players: [], gameSettings: [], characters: [], playersCharacters: [], cardTypes: [], cards: [], charactersCards: [], scenes: [], sceneCharacters: [], conflicts: [], conflictPips: [], cardInstances: [], moves: [], goals: [], sceneGoals: [], assets: [], sceneAssets: [], subplots: [], subplotsProgress: [], hostActions: [], selectedGameIdx: 0
-    };
+
+    // --- RelationalDb integration ---
+    let dbDriver = null;
 
     function parseTables(text) {
-        const lines = text.split(/\r?\n/);
-        let currentTable = null;
-        let columns = [];
-        let tables = {};
-        for (let line of lines) {
-            line = line.trim();
-            if (!line || line.startsWith('//')) { currentTable = null; continue; }
-            if (line.startsWith('tbl') && line.includes(':')) {
-                const [tableName, colStr] = line.split(':');
-                columns = colStr.split('|').map(s => s.trim());
-                currentTable = tableName.trim();
-                tables[currentTable] = tables[currentTable] || [];
-                continue;
-            }
-            if (currentTable) {
-                const values = line.split('|').map(s => s.trim());
-                let row = {};
-                columns.forEach((col, i) => row[col] = values[i] !== undefined ? values[i] : null);
-                tables[currentTable].push(row);
-            }
+        // Use RelationalDb.DatabaseDriver to parse tables from text
+        dbDriver = new global.RelationalDb.DatabaseDriver();
+        dbDriver.loadFromText(text);
+        // For legacy compatibility, return a plain object of arrays
+        const tables = {};
+        for (const tblName in dbDriver.database.tables.tables) {
+            const table = dbDriver.database.tables.tables[tblName];
+            tables[tblName] = table.rows.data.map(row => {
+                const obj = {};
+                table.columns.names.forEach((col, i) => { obj[col] = row.data[i]; });
+                return obj;
+            });
         }
         return tables;
     }
 
     function buildDataModelFromTables(tables) {
+        // Legacy: keep state in sync for now
         function int(v) { return v === undefined || v === null ? null : parseInt(v, 10); }
         state.games = (tables.tblGames||[]).map(r => ({ id: int(r.id), name: r.name, desc: r.desc }));
         state.players = (tables.tblPlayers||[]).map(r => ({ id: int(r.id), name: r.name }));
@@ -98,6 +90,9 @@
         createGame,
         removeGame,
         updateGame,
-        updateGameDesc
+        updateGameDesc,
+        // RelationalDb API
+        getDbDriver: () => dbDriver,
+        getDb: () => dbDriver ? dbDriver.getDatabase() : null
     };
 })(typeof window !== 'undefined' ? window : this);

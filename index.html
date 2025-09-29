@@ -9,8 +9,29 @@
 <body>
     <!-- UI will be built dynamically by JS -->
 
+    <!--
+      Automatic script loading for plugin system:
+      To disable, remove the following <script> block and add your own <script src="..."></script> tags as needed.
+    -->
     <script>
-      window.StoriumHub && window.StoriumHub.init && window.StoriumHub.init();
+      // List of scripts to load in order
+      var storiumScripts = [
+        'https://raw.githubusercontent.com/Cava1ier/libraries/refs/heads/main/css/css-management.js',
+        'https://raw.githubusercontent.com/Cava1ier/libraries/main/database/databasegrokai.js',
+        'storium_data.js',
+        'storium_uix.js',
+        'storium_hub.js'
+      ];
+      function loadScriptsSequentially(scripts, cb) {
+        if (!scripts.length) return cb && cb();
+        var s = document.createElement('script');
+        s.src = scripts[0];
+        s.onload = function() { loadScriptsSequentially(scripts.slice(1), cb); };
+        document.head.appendChild(s);
+      }
+      loadScriptsSequentially(storiumScripts, function() {
+        if (window.StoriumHub && window.StoriumHub.init) window.StoriumHub.init();
+      });
     </script>
 </body>
 </html>
