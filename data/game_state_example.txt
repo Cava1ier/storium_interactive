@@ -1,0 +1,91 @@
+// Example Storium game state for a single game, first scene
+// All tables/entities needed for a minimal but complete state
+
+tblGames: id | name | desc
+1 | Demo Game | A sample game for testing
+
+tblPlayers: id | name
+1 | Alice
+2 | Bob
+3 | Carol
+4 | Dave
+5 | Eve
+
+tblCharacters: id | game_id | name | status | is_pc
+1 | 1 | Alice's Hero | active | 1
+2 | 1 | Bob's Hero | active | 1
+3 | 1 | Carol's Hero | active | 1
+4 | 1 | Dave's Hero | active | 1
+5 | 1 | Eve's Hero | active | 1
+
+tblScenes: id | game_id | name | desc | place_card_id | status | intro_narration
+1 | 1 | Opening Scene | The adventure begins | 1 | open | Welcome to the story!
+
+tblCardTypes: id | name | category | is_wild
+1 | Place | place | 0
+2 | Obstacle | obstacle | 0
+3 | Character Conflict | conflict | 0
+4 | Asset | asset | 0
+5 | Goal | goal | 0
+
+tblCards: id | game_id | name | desc | card_type_id
+1 | 1 | Castle | The ancient castle | 1
+2 | 1 | Forest | The dark forest | 1
+3 | 1 | Locked Door | Blocks the way | 2
+4 | 1 | River | Fast and dangerous | 2
+5 | 1 | Guard | Watches the entrance | 2
+6 | 1 | Rival | A personal foe | 3
+7 | 1 | Doubt | Inner struggle | 3
+8 | 1 | Temptation | A risky offer | 3
+9 | 1 | Burden | Heavy responsibility | 3
+10 | 1 | Magic Key | Opens the door | 4
+11 | 1 | Map | Shows the way | 4
+12 | 1 | Escape | Get out safely | 5
+
+tblScenes: id | game_id | name | desc | place_card_id | status | intro_narration
+1 | 1 | Opening Scene | The adventure begins | 1 | open | Welcome to the story!
+
+tblSceneCharacters: id | scene_id | character_id | is_npc
+1 | 1 | 1 | 0
+2 | 1 | 2 | 0
+3 | 1 | 3 | 0
+4 | 1 | 4 | 0
+5 | 1 | 5 | 0
+
+tblConflicts: id | scene_id | card_id | type | name | desc | max_pips | status
+1 | 1 | 3 | obstacle | Locked Door | Blocks the way | 3 | open
+2 | 1 | 4 | obstacle | River | Fast and dangerous | 3 | open
+3 | 1 | 5 | obstacle | Guard | Watches the entrance | 3 | open
+4 | 1 | 6 | character | Rival | A personal foe | 1 | open
+5 | 1 | 7 | character | Doubt | Inner struggle | 1 | open
+6 | 1 | 8 | character | Temptation | A risky offer | 1 | open
+7 | 1 | 9 | character | Burden | Heavy responsibility | 1 | open
+
+tblConflictPips: id | conflict_id | pip_number | assigned_character_id | assigned_card_instance_id | outcome | narrative
+1 | 1 | 1 |   |   |   |   
+2 | 1 | 2 |   |   |   |   
+3 | 1 | 3 |   |   |   |   
+4 | 2 | 1 |   |   |   |   
+5 | 2 | 2 |   |   |   |   
+6 | 2 | 3 |   |   |   |   
+7 | 3 | 1 |   |   |   |   
+8 | 3 | 2 |   |   |   |   
+9 | 3 | 3 |   |   |   |   
+10 | 4 | 1 |   |   |   |   
+11 | 5 | 1 |   |   |   |   
+12 | 6 | 1 |   |   |   |   
+13 | 7 | 1 |   |   |   |   
+
+tblAssets: id | game_id | name | desc
+1 | 1 | Magic Key | Opens the door
+2 | 1 | Map | Shows the way
+
+tblSceneAssets: id | scene_id | asset_id | assigned_character_id | status
+1 | 1 | 1 | 1 | grabbed
+2 | 1 | 2 |   | available
+
+tblGoals: id | game_id | name | desc
+1 | 1 | Escape | Get out safely
+
+tblSceneGoals: id | scene_id | goal_id | assigned_character_id | status
+1 | 1 | 1 |   | open

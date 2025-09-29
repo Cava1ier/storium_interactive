@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storium Interactive TODO List</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        h1 { color: #333; }
+        ul { list-style: none; padding: 0; }
+        li { margin-bottom: 1em; }
+        label { cursor: pointer; }
+        .done { text-decoration: line-through; color: #888; }
+    </style>
+</head>
+<body>
+    <h1>Project TODO List</h1>
+    <ul id="todo-list">
+        <li><label><input type="checkbox"> Flesh Out the Full Game State TreeView</label></li>
+        <li><label><input type="checkbox"> Integrate the Database Library</label></li>
+        <li><label><input type="checkbox"> Separate UI from Data Logic</label></li>
+        <li><label><input type="checkbox"> Modularize the Codebase</label></li>
+        <li><label><input type="checkbox"> Add Import/Export Functionality</label></li>
+        <li><label><input type="checkbox"> CRUD UI for All Tables</label></li>
+        <li><label><input type="checkbox"> Sync UI and Data</label></li>
+        <li><label><input type="checkbox"> Testing and Validation</label></li>
+        <li><label><input type="checkbox"> Documentation and Future-Proofing</label></li>
+    </ul>
+    <script>
+        // Save and load checkbox state from localStorage
+        const checkboxes = document.querySelectorAll('#todo-list input[type="checkbox"]');
+        checkboxes.forEach((cb, i) => {
+            const checked = localStorage.getItem('todo-' + i) === 'true';
+            cb.checked = checked;
+            if (checked) cb.parentElement.classList.add('done');
+            cb.addEventListener('change', function() {
+                localStorage.setItem('todo-' + i, cb.checked);
+                cb.parentElement.classList.toggle('done', cb.checked);
+            });
+        });
+    </script>
+</body>
+</html>
